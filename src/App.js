@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
 import './App.css';
+emailjs.init("user_S2B6oiUmBtw2Y5iTdBpK7");
 
 // Taken from stackoverflow
 function getShuffledArr(arr) {
@@ -14,18 +15,21 @@ function getShuffledArr(arr) {
 function App() {
 
   const sendEmail = templateParams => {
-    // emailjs.send('default_service', 'template_bt5l82r', templateParams, 'email_S2B6oiUmBtw2Y5iTdBpK7')
-    //   .then((result) => {
-    //     console.log(result.text);
-    //   }, (error) => {
-    //     console.log(error.text);
-    //   });
+    emailjs.send('default_service', 'template_bt5l82r', templateParams)
+      .then((result) => {
+        console.log(result.text);
+      }, (error) => {
+        console.log(error.text);
+      });
   }
   const generateEmail = () => {
     fetch(`https://sv443.net/jokeapi/v2/joke/Any?blacklistFlags=nsfw,religious,political,racist,sexist&type=twopart&amount=${emailState.length}`)
       .then(res => res.json())
       .then((data) => {
-        let jokes = data.jokes;
+        let jokes = [data];
+        if (data.jokes) {
+        jokes = data.jokes;
+        }
         const shuffledEmailState = getShuffledArr(emailState);
         shuffledEmailState.forEach((email, index) => {
           let incrementedIndex = index + 1;
@@ -34,27 +38,29 @@ function App() {
           }
           const joke = jokes.pop()
           const message = `Dear ${email.name}
-          
+          <br><br>
           Merry Christmas!!!
-          
-          Your Secret Santa is ${shuffledEmailState[incrementedIndex].name}.
-          
+          <br><br>
+          Your Secret Santa is <b>${shuffledEmailState[incrementedIndex].name}</b>.
+          <br><br><br>
           ${joke.setup}
-          
+          <br>
           ...
-
+          <br>
           ${joke.delivery}
-
+          <br><br>
           From Santa
           `;
           const templateParams = {
             to: email.email,
-            messname: message
+            message: message
           }
 
           sendEmail(templateParams);
         })
       })
+
+      setEmailState([{ ...blankEmail }])
   }
 
   const blankEmail = { email: '', name: '' };
