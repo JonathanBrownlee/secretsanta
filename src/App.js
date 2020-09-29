@@ -3,17 +3,26 @@ import emailjs from 'emailjs-com';
 import './App.css';
 
 // Taken from stackoverflow
-function getShuffledArr (arr){
-  return [...arr].map( (_, i, arrCopy) => {
-      var rand = i + ( Math.floor( Math.random() * (arrCopy.length - i) ) );
-      [arrCopy[rand], arrCopy[i]] = [arrCopy[i], arrCopy[rand]]
-      return arrCopy[i]
+function getShuffledArr(arr) {
+  return [...arr].map((_, i, arrCopy) => {
+    var rand = i + (Math.floor(Math.random() * (arrCopy.length - i)));
+    [arrCopy[rand], arrCopy[i]] = [arrCopy[i], arrCopy[rand]]
+    return arrCopy[i]
   })
 }
 
 function App() {
-  function sendEmail() {
-    fetch("https://sv443.net/jokeapi/v2/joke/Any?blacklistFlags=nsfw,religious,political,racist,sexist&type=twopart&amount=5")
+
+  const sendEmail = templateParams => {
+    // emailjs.send('default_service', 'template_bt5l82r', templateParams, 'email_S2B6oiUmBtw2Y5iTdBpK7')
+    //   .then((result) => {
+    //     console.log(result.text);
+    //   }, (error) => {
+    //     console.log(error.text);
+    //   });
+  }
+  const generateEmail = () => {
+    fetch(`https://sv443.net/jokeapi/v2/joke/Any?blacklistFlags=nsfw,religious,political,racist,sexist&type=twopart&amount=${emailState.length}`)
       .then(res => res.json())
       .then((data) => {
         let jokes = data.jokes;
@@ -43,16 +52,11 @@ function App() {
             messname: message
           }
 
-          console.log(templateParams);
-          // emailjs.send('default_service', 'template_bt5l82r', templateParams, 'email_S2B6oiUmBtw2Y5iTdBpK7')
-          //   .then((result) => {
-          //     console.log(result.text);
-          //   }, (error) => {
-          //     console.log(error.text);
-          //   });
+          sendEmail(templateParams);
         })
       })
   }
+
   const blankEmail = { email: '', name: '' };
   const [emailState, setEmailState] = useState([
     { ...blankEmail },
@@ -66,9 +70,7 @@ function App() {
     const updatedEmails = [...emailState];
     updatedEmails[e.target.dataset.idx][e.target.className] = e.target.value;
     setEmailState(updatedEmails);
-    console.log()
   };
-
 
   return (
     <div>
@@ -109,7 +111,7 @@ function App() {
             );
           })
         }
-        <input type="button" value="Submit" onClick={sendEmail} />
+        <input type="button" value="Submit" onClick={generateEmail} />
       </form>
     </div>
   );
